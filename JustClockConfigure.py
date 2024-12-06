@@ -170,9 +170,17 @@ class CTkWindow(customtkinter.CTk):
 
         self.font_size_label = customtkinter.CTkLabel(self.general_frame, text="Размер шрифта:")
         self.font_size_label.grid(row=3, column=0, padx=10, pady=10, sticky="w")
-        self.font_size_entry = customtkinter.CTkEntry(self.general_frame)
-        self.font_size_entry.grid(row=3, column=1, padx=10, pady=10, sticky="ew")
-        self.font_size_entry.insert(0, self.settings_config.get('General', 'font_size'))
+
+        self.font_size_frame = customtkinter.CTkFrame(self.general_frame, fg_color="transparent")
+        self.font_size_frame.grid(row=3, column=1, padx=10, pady=10, sticky="ew")
+
+        self.font_size_scale = customtkinter.CTkSlider(self.font_size_frame, from_=10, to=50, number_of_steps=40, width=100, command=self.update_font_size)
+        self.font_size_scale.pack(side="left", padx=(0, 10))
+
+        self.font_size_value_label = customtkinter.CTkLabel(self.font_size_frame, text=str(int(float(self.settings_config.get('General', 'font_size')))))
+        self.font_size_value_label.pack(side="left")
+
+        self.font_size_scale.set(int(float(self.settings_config.get('General', 'font_size'))))
 
         self.font_color_label = customtkinter.CTkLabel(self.general_frame, text="Цвет шрифта:")
         self.font_color_label.grid(row=4, column=0, padx=10, pady=10, sticky="w")
@@ -200,9 +208,17 @@ class CTkWindow(customtkinter.CTk):
 
         self.seconds_bar_height_label = customtkinter.CTkLabel(self.general_frame, text="Высота секундной полоски:")
         self.seconds_bar_height_label.grid(row=7, column=0, padx=10, pady=10, sticky="w")
-        self.seconds_bar_height_entry = customtkinter.CTkEntry(self.general_frame)
-        self.seconds_bar_height_entry.grid(row=7, column=1, padx=10, pady=10, sticky="ew")
-        self.seconds_bar_height_entry.insert(0, self.settings_config.get('General', 'seconds_bar_height'))
+
+        self.seconds_bar_height_frame = customtkinter.CTkFrame(self.general_frame, fg_color="transparent")
+        self.seconds_bar_height_frame.grid(row=7, column=1, padx=10, pady=10, sticky="ew")
+
+        self.seconds_bar_height_scale = customtkinter.CTkSlider(self.seconds_bar_height_frame, from_=1, to=10, number_of_steps=9, width=100, command=self.update_seconds_bar_height)
+        self.seconds_bar_height_scale.pack(side="left", padx=(0, 10))
+
+        self.seconds_bar_height_value_label = customtkinter.CTkLabel(self.seconds_bar_height_frame, text=self.settings_config.get('General', 'seconds_bar_height'))
+        self.seconds_bar_height_value_label.pack(side="left")
+
+        self.seconds_bar_height_scale.set(int(self.settings_config.get('General', 'seconds_bar_height')))
 
         self.seconds_bar_color_label = customtkinter.CTkLabel(self.general_frame, text="Цвет секундной полоски:")
         self.seconds_bar_color_label.grid(row=8, column=0, padx=10, pady=10, sticky="w")
@@ -254,9 +270,17 @@ class CTkWindow(customtkinter.CTk):
         self.save_button = customtkinter.CTkButton(self.app, text="Сохранить настройки", command=self.save_settings)
         self.save_button.grid(row=14, column=0, padx=10, pady=10, sticky="ew")
 
+    def update_font_size(self, value):
+        self.font_size_scale.set(int(value))
+        self.font_size_value_label.configure(text=str(int(value)))
+
     def update_seconds_bar_show_label(self):
         current_state = self.seconds_bar_show_switch.get()
         self.seconds_bar_show_state_label.configure(text=TRANSLATIONS[current_state.lower()])
+
+    def update_seconds_bar_height(self, value):
+        self.seconds_bar_height_scale.set(int(value))
+        self.seconds_bar_height_value_label.configure(text=str(int(value)))
 
     def update_chime_on_start_label(self):
         current_state = self.chime_on_start_switch.get()
@@ -279,11 +303,11 @@ class CTkWindow(customtkinter.CTk):
         self.settings_config.set('General', 'clock_position', self.translate_back(self.clock_position_combobox.get()))
         self.settings_config.set('General', 'font_name', self.font_name_combobox.get())
         self.settings_config.set('General', 'font_style', self.translate_back(self.font_style_combobox.get()))
-        self.settings_config.set('General', 'font_size', self.font_size_entry.get())
+        self.settings_config.set('General', 'font_size', str(int(self.font_size_scale.get())))
         self.settings_config.set('General', 'font_color', self.font_color_entry.get())
         self.settings_config.set('General', 'paper_color', self.paper_color_entry.get())
         self.settings_config.set('General', 'seconds_bar_show', self.seconds_bar_show_switch.get())
-        self.settings_config.set('General', 'seconds_bar_height', self.seconds_bar_height_entry.get())
+        self.settings_config.set('General', 'seconds_bar_height', str(int(self.seconds_bar_height_scale.get())))
         self.settings_config.set('General', 'seconds_bar_color', self.seconds_bar_color_entry.get())
         self.settings_config.set('General', 'playback_start', self.playback_start_entry.get())
         self.settings_config.set('General', 'playback_end', self.playback_end_entry.get())
@@ -303,16 +327,16 @@ class CTkWindow(customtkinter.CTk):
         self.clock_position_combobox.set(TRANSLATIONS[default_settings['General']['clock_position']])
         self.font_name_combobox.set(default_settings['General']['font_name'])
         self.font_style_combobox.set(TRANSLATIONS[default_settings['General']['font_style']])
-        self.font_size_entry.delete(0, customtkinter.END)
-        self.font_size_entry.insert(0, default_settings['General']['font_size'])
+        self.font_size_scale.set(int(default_settings['General']['font_size']))
+        self.font_size_value_label.configure(text=str(int(default_settings['General']['font_size'])))
         self.font_color_entry.delete(0, customtkinter.END)
         self.font_color_entry.insert(0, default_settings['General']['font_color'])
         self.paper_color_entry.delete(0, customtkinter.END)
         self.paper_color_entry.insert(0, default_settings['General']['paper_color'])
         self.seconds_bar_show_switch.select() if default_settings['General']['seconds_bar_show'] == "True" else self.seconds_bar_show_switch.deselect()
         self.seconds_bar_show_state_label.configure(text=TRANSLATIONS[default_settings['General']['seconds_bar_show'].lower()])
-        self.seconds_bar_height_entry.delete(0, customtkinter.END)
-        self.seconds_bar_height_entry.insert(0, default_settings['General']['seconds_bar_height'])
+        self.seconds_bar_height_scale.set(int(default_settings['General']['seconds_bar_height']))
+        self.seconds_bar_height_value_label.configure(text=default_settings['General']['seconds_bar_height'])
         self.seconds_bar_color_entry.delete(0, customtkinter.END)
         self.seconds_bar_color_entry.insert(0, default_settings['General']['seconds_bar_color'])
         self.playback_start_entry.delete(0, customtkinter.END)
@@ -433,7 +457,7 @@ class CTkWindow(customtkinter.CTk):
         if "title" in kwargs:
             self.title_label.configure(text=f"  {kwargs['title']}")
         if "icon" in kwargs:
-            self.icon = customtkinter.CTkImage(Image.open(kwargs["icon"]), size=(16,16))
+            self.icon = customtkinter.CTkImage(Image.open(kwargs["icon"]), size=(32,32))
             self.title_label.configure(image=self.icon)
         if "fg_color" in kwargs:
             self.app.configure(fg_color=fg_color)
