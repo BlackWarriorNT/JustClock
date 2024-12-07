@@ -1,3 +1,4 @@
+import configparser
 import customtkinter as ctk
 from datetime import datetime, timedelta
 import time
@@ -41,7 +42,6 @@ playback_end = "23:00"  # Конец промежутка воспроизвед
 # Настройки воспроизведения chime.mp3
 chime_on_start = True  # Разрешение воспроизведения файла chime.mp3 при запуске программы
 chime_before_hour = True  # Разрешение воспроизведения файла chime.mp3 перед воспроизведением mp3-файла с номером часа
-### Конец блока с важными переменными
 
 # Настройки размера окна
 window_width_percentage = 1.05  # Ширина окна на 5% больше размера шрифта
@@ -133,6 +133,52 @@ def is_within_playback_range(current_time):
         end_time += timedelta(days=1)
 
     return start_time <= current_time <= end_time
+
+def read_config():
+    config = configparser.ConfigParser()
+    config_file = os.path.join(application_path, "JustClock.ini")
+    if not os.path.exists(config_file):
+        create_default_config(config_file)
+    config.read(config_file)
+    return config
+
+def create_default_config(config_file):
+    config = configparser.ConfigParser()
+    config["General"] = {
+        "clock_position": "bottom_right",
+        "font_name": "Tahoma",
+        "font_style": "bold",
+        "font_size": 18,
+        "font_color": "#D4D4D4",
+        "paper_color": "#1E1E1E",
+        "seconds_bar_show": True,
+        "seconds_bar_height": 4,
+        "seconds_bar_color": "#4C72AF",
+        "playback_start": "06:00",
+        "playback_end": "23:00",
+        "chime_on_start": True,
+        "chime_before_hour": True,
+    }
+    with open(config_file, "w") as f:
+        config.write(f)
+
+# Чтение настроек из файла
+config = read_config()
+
+# Применение настроек из файла
+clock_position = config["General"]["clock_position"]
+font_name = config["General"]["font_name"]
+font_style = config["General"]["font_style"]
+font_size = int(config["General"]["font_size"])
+font_color = config["General"]["font_color"]
+paper_color = config["General"]["paper_color"]
+seconds_bar_show = config.getboolean("General", "seconds_bar_show")
+seconds_bar_height = int(config["General"]["seconds_bar_height"])
+seconds_bar_color = config["General"]["seconds_bar_color"]
+playback_start = config["General"]["playback_start"]
+playback_end = config["General"]["playback_end"]
+chime_on_start = config.getboolean("General", "chime_on_start")
+chime_before_hour = config.getboolean("General", "chime_before_hour")
 
 ctk.set_appearance_mode("dark")  # Установить режим внешнего вида в темный
 ctk.set_default_color_theme("blue")  # Установить тему цвета по умолчанию
