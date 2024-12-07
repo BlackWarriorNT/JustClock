@@ -39,7 +39,7 @@ TRANSLATIONS = {
 default_settings = {
     'General': {
         'clock_position': 'bottom_right',
-        'font_name': 'Tahoma',
+        'font_name': 'Helvetica',
         'font_style': 'bold',
         'font_size': '18',
         'font_color': '#D4D4D4',
@@ -62,8 +62,8 @@ class CTkWindow(customtkinter.CTk):
                 titlebar_color = "default", # Specify the color of top bar
                 title_color = "default", # Title label color
                 fg_color = "default", # fg_color of window
-                resizable = True, # Resize window dynamically
-                round_corner = 12, # corner_radius
+                resizable = False, # Resize window dynamically
+                round_corner = 16, # corner_radius
                 icon = None, # icon path
                 justify = "left", # title justify
                 style = "classic" # style
